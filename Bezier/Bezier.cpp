@@ -6,9 +6,10 @@ using namespace std;
 
 #define WindowSIZE 200
 
-int num = 20;
-int is_get = 0;
-int STEP = 100;
+int num = 0;
+int is_get = -1;
+int STEP = 1000;
+bool is_draw = false;
 
 typedef struct Point
 {
@@ -16,6 +17,19 @@ typedef struct Point
 }Point;
 
 Point* P = new Point[num];
+
+void change(void)
+{
+	Point* temp = new Point[num + 1];
+	for (int i = 0; i < num; i++)
+	{
+		temp[i] = P[i];
+	}
+	delete[]P;
+	num++;
+	is_get = num - 1;
+	P = temp;
+}
 
 float C(int n, int k)
 {
@@ -34,14 +48,6 @@ float C(int n, int k)
 
 void Bezier(void)
 {
-	glColor3f(1.0, 0.0, 0.0);
-	glBegin(GL_LINE_STRIP);
-	for (int i = 0; i < num; i++)
-	{
-		glVertex2f(P[i].x, P[i].y);
-	}
-	glEnd();
-
 	glColor3f(0.0, 0.0, 1.0);
 	glBegin(GL_LINE_STRIP);
 	for (int i = 0; i <= STEP; i++)
@@ -56,7 +62,6 @@ void Bezier(void)
 		}
 
 		glVertex2f(x, y);
-		cout << i << "\t" << x << "\t" << y << endl;
 	}
 	glEnd();
 }
@@ -64,31 +69,29 @@ void Bezier(void)
 void myDisplay(void)
 {
 	glClearColor(1.0, 1.0, 1.0, 0.0);
-	glMatrixMode(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
+
+	glColor3f(1.0, 0.0, 0.0);
+
+	glBegin(GL_LINE_STRIP);
+	for (int i = 0; i < num; i++)
+	{
+		glVertex2f(P[i].x, P[i].y);
+	}
+	glEnd();
+
+	glPointSize(3);
+	glBegin(GL_POINTS);
+	for (int i = 0; i < num; i++)
+	{
+		glVertex2f(P[i].x, P[i].y);
+	}
+	glEnd();
 
 	if (is_get == num)
 	{
 		Bezier();
-	}
-	else
-	{
-		glColor3f(1.0, 0.0, 0.0);
-
-		glBegin(GL_LINE_STRIP);
-		for (int i = 0; i < is_get; i++)
-		{
-			glVertex2f(P[i].x, P[i].y);
-		}
-		glEnd();
-
-		glPointSize(3);
-		glBegin(GL_POINTS);
-		for (int i = 0; i < is_get; i++)
-		{
-			glVertex2f(P[i].x, P[i].y);
-		}
-		glEnd();
 	}
 
 	glFlush();
@@ -100,13 +103,23 @@ void mouse(int button, int state, int x, int y)
 	{
 		if (state == GLUT_DOWN)
 		{
-			if (is_get != num)
+			if (is_draw)
 			{
-				P[is_get].x = x - WindowSIZE;
-				P[is_get].y = WindowSIZE - y;
-				cout << P[is_get].x << "\t" << P[is_get].y << endl;
-				is_get++;
+				num = 0;
+				is_get = -1;
+				is_draw = false;
 			}
+			change();
+			P[is_get].x = x - WindowSIZE;
+			P[is_get].y = WindowSIZE - y;
+		}
+	}
+	if (button == GLUT_RIGHT_BUTTON)
+	{
+		if (state == GLUT_DOWN)
+		{
+			is_get = num;
+			is_draw = true;
 		}
 	}
 
