@@ -6,7 +6,7 @@ using namespace std;
 
 #define WindowSIZE 200
 
-int num = 15;
+int num = 20;
 int is_get = 0;
 int STEP = 100;
 
@@ -19,8 +19,7 @@ Point* P = new Point[num];
 
 float C(int n, int k)
 {
-	int temp1 = 1, temp2 = 1;
-	float temp;
+	float temp, temp1 = 1, temp2 = 1;
 	for (int i = n; i > n - k; i--)
 	{
 		temp1 *= i;
@@ -44,13 +43,13 @@ void Bezier(void)
 	glEnd();
 
 	glColor3f(0.0, 0.0, 1.0);
-	glBegin(GL_POINTS);
+	glBegin(GL_LINE_STRIP);
 	for (int i = 0; i <= STEP; i++)
 	{
 		float u = (float)i / (float)STEP;
 		float x = 0, y = 0, n = num - 1;
 
-		for (int k = 0; k < num;k ++)
+		for (int k = 0; k < num; k++)
 		{
 			x += C(n, k) * pow(u, k) * pow(1 - u, n - k) * P[k].x;
 			y += C(n, k) * pow(u, k) * pow(1 - u, n - k) * P[k].y;
@@ -110,6 +109,7 @@ void mouse(int button, int state, int x, int y)
 			}
 		}
 	}
+
 	glutPostRedisplay();
 }
 
